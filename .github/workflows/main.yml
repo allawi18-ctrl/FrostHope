@@ -1,141 +1,279 @@
-name: "Godot Web Export & Deploy"
-
-on:
-  push:
-    branches:
-      - main
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>FrostHope</title>
+    <title>FrostHope - لعبة الصقيع</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            background: #050b18;
-            color: #fff;
-            font-family: Arial, sans-serif;
-            text-align: center;
+            background: #0b1329;
             overflow: hidden;
+            font-family: sans-serif;
             touch-action: none;
-        }
-        #ui {
-            margin-top: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            color: #38bdf8;
+            user-select: none;
         }
         canvas {
-            background: linear-gradient(to bottom, #0b1329, #1e293b);
             display: block;
-            margin: 8px auto;
-            border: 2px solid #38bdf8;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+            background: linear-gradient(to bottom, #050b14, #121c38);
+        }
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #fff;
+            pointer-events: none;
+        }
+        .score {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+        }
+        .bar-container {
+            width: 200px;
+            height: 14px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 7px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .bar-fill {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #ff4e50, #f9d423);
+            transition: width 0.1s linear;
+        }
+        #gameover {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #fff;
+            display: none;
+            pointer-events: auto;
+        }
+        #gameover h1 {
+            font-size: 36px;
+            color: #ff4e50;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px rgba(255, 78, 80, 0.7);
+        }
+        #gameover p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            background: #00f2fe;
+            color: #050b14;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.6);
         }
     </style>
 </head>
 <body>
-    <div id="ui">FrostHope | النقاط: <span id="score">0</span></div>
-    <canvas id="gameCanvas" width="350" height="480"></canvas>
-    <p style="font-size: 12px; color: #94a3b8; margin: 0;">اضغط يمين أو يسار الشاشة للتحريك</p>
+
+    <div id="ui">
+        <div class="score">النقاط: <span id="scoreVal">0</span></div>
+        <div class="bar-container">
+            <div id="heatBar" class="bar-fill"></div>
+        </div>
+    </div>
+
+    <div id="gameover">
+        <h1>انتهى الدفء!</h1>
+        <p>تجمدت في العاصفة. مجموع نقاطك: <span id="finalScore">0</span></p>
+        <button class="btn" onclick="restartGame()">إعادة المحاولة</button>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
 
     <script>
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
 
         let score = 0;
-        let player = { x: 175, y: 420, radius: 18, speed: 6 };
-        let target = { x: Math.random() * 300 + 25, y: -20, radius: 14, speed: 3.5 };
+        let heat = 100;
+        let isGameOver = false;
 
-        window.addEventListener("touchstart", (e) => {
-            let touchX = e.touches[0].clientX;
-            let canvasRect = canvas.getBoundingClientRect();
-            let relativeX = touchX - canvasRect.left;
-            
-            if (relativeX < canvas.width / 2) {
-                player.x = Math.max(25, player.x - 40);
-            } else {
-                player.x = Math.min(canvas.width - 25, player.x + 40);
-            }
+        // الشخصية
+        let player = {
+            x: canvas.width / 2,
+            y: canvas.height - 120,
+            radius: 22,
+            targetX: canvas.width / 2,
+            speed: 0.1
+        };
+
+        // البلورات الدافئة
+        let crystals = [];
+        // الثلج المتساقط
+        let snowflakes = [];
+
+        for (let i = 0; i < 60; i++) {
+            snowflakes.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 2.5 + 1,
+                speed: Math.random() * 1.5 + 0.5,
+                drift: Math.random() * 1 - 0.5
+            });
+        }
+
+        // التحكم باللمس المباشر
+        window.addEventListener('pointerdown', (e) => {
+            if (isGameOver) return;
+            player.targetX = e.clientX;
         });
 
+        window.addEventListener('pointermove', (e) => {
+            if (isGameOver || e.buttons === 0) return;
+            player.targetX = e.clientX;
+        });
+
+        function spawnCrystal() {
+            crystals.push({
+                x: Math.random() * (canvas.width - 60) + 30,
+                y: -30,
+                radius: 14,
+                speed: 3 + Math.min(score * 0.05, 5)
+            });
+        }
+
+        let spawnTimer = 0;
+
         function update() {
-            target.y += target.speed;
-            
-            if (target.y > canvas.height) {
-                target.y = -20;
-                target.x = Math.random() * (canvas.width - 50) + 25;
+            if (isGameOver) return;
+
+            // حركة اللاعب السلسة باتجاه اللمس
+            player.x += (player.targetX - player.x) * 0.2;
+
+            // تقليص عداد الدفء بمرور الوقت
+            heat -= 0.12;
+            if (heat <= 0) {
+                heat = 0;
+                gameOver();
+            }
+            document.getElementById('heatBar').style.width = heat + '%';
+
+            // تحديث الثلج
+            for (let flake of snowflakes) {
+                flake.y += flake.speed;
+                flake.x += flake.drift;
+                if (flake.y > canvas.height) {
+                    flake.y = -10;
+                    flake.x = Math.random() * canvas.width;
+                }
             }
 
-            let dist = Math.hypot(player.x - target.x, player.y - target.y);
-            if (dist < player.radius + target.radius) {
-                score += 10;
-                document.getElementById("score").innerText = score;
-                target.y = -20;
-                target.x = Math.random() * (canvas.width - 50) + 25;
-                target.speed += 0.25;
+            // توليد البلورات
+            spawnTimer++;
+            if (spawnTimer > 45) {
+                spawnCrystal();
+                spawnTimer = 0;
+            }
+
+            // تحديث البلورات والاصطدام
+            for (let i = crystals.length - 1; i >= 0; i--) {
+                let c = crystals[i];
+                c.y += c.speed;
+
+                // فحص الاصطدام باللاعب
+                let dist = Math.hypot(player.x - c.x, player.y - c.y);
+                if (dist < player.radius + c.radius) {
+                    score += 10;
+                    heat = Math.min(100, heat + 25); // استعادة جزء من الدفء
+                    document.getElementById('scoreVal').innerText = score;
+                    crystals.splice(i, 1);
+                    continue;
+                }
+
+                // إزالة البلورة إذا سقطت خارج الشاشة
+                if (c.y > canvas.height + 50) {
+                    crystals.splice(i, 1);
+                }
             }
         }
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // رسم اللاعب (الناجي في الجليد)
-            ctx.fillStyle = "#38bdf8";
+            // رسم الثلج
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            for (let flake of snowflakes) {
+                ctx.beginPath();
+                ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // رسم البلورات الذهبية الدافئة
+            for (let c of crystals) {
+                ctx.save();
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#f9d423';
+                ctx.fillStyle = '#f9d423';
+                ctx.beginPath();
+                ctx.arc(c.x, c.y, c.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            // رسم اللاعب (هالة سماوية وشخصية ناصعة)
+            ctx.save();
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = '#00f2fe';
+            ctx.fillStyle = '#ffffff';
             ctx.beginPath();
             ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
             ctx.fill();
-            ctx.strokeStyle = "#ffffff";
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            // رسم جوهرة الدفء
-            ctx.fillStyle = "#facc15";
-            ctx.beginPath();
-            ctx.arc(target.x, target.y, target.radius, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.restore();
         }
 
         function loop() {
             update();
             draw();
-            requestAnimationFrame(loop);
+            if (!isGameOver) {
+                requestAnimationFrame(loop);
+            }
+        }
+
+        function gameOver() {
+            isGameOver = true;
+            document.getElementById('finalScore').innerText = score;
+            document.getElementById('gameover').style.display = 'block';
+        }
+
+        function restartGame() {
+            score = 0;
+            heat = 100;
+            isGameOver = false;
+            crystals = [];
+            player.x = canvas.width / 2;
+            player.targetX = canvas.width / 2;
+            document.getElementById('scoreVal').innerText = score;
+            document.getElementById('gameover').style.display = 'none';
+            loop();
         }
 
         loop();
     </script>
 </body>
 </html>
-
-jobs:
-  export_web:
-    name: Web Export
-    runs-on: ubuntu-latest
-    container:
-      image: barichello/godot-ci:4.2.1
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          lfs: true
-
-      - name: Setup Godot Templates
-        run: |
-          mkdir -v -p ~/.local/share/godot/build_templates
-          mv /root/.local/share/godot/templates/* ~/.local/share/godot/build_templates/
-
-      - name: Create Web Build Directory
-        run: mkdir -v -p build/web
-
-      - name: Export Web
-        run: godot --headless --export-release "Web" build/web/index.html
-
-      - name: Deploy to GitHub Pages
-        uses: Peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build/web
-          publish_branch: gh-pages
