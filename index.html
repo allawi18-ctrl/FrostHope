@@ -3,14 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>❄️ النجاة في الصقيع</title>
+    <title>❄️ مدينة الجليد</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, system-ui, sans-serif;
             background: linear-gradient(145deg, #0b1a2e, #1a2f3f);
@@ -22,389 +17,216 @@
             align-items: center;
         }
         .container {
-            max-width: 500px;
+            max-width: 450px;
             width: 100%;
             background: rgba(255,255,255,0.05);
             backdrop-filter: blur(10px);
             border-radius: 32px;
-            padding: 20px;
+            padding: 24px 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.7);
             border: 1px solid rgba(255,255,255,0.08);
         }
-        h1 {
-            text-align: center;
-            font-size: 28px;
-            margin-bottom: 16px;
-            letter-spacing: 1px;
-            text-shadow: 0 0 20px rgba(100,200,255,0.3);
-        }
-        .status-grid {
+        h1 { text-align: center; font-size: 26px; margin-bottom: 16px; }
+        .day { text-align: center; font-size: 20px; color: #74b9ff; margin-bottom: 16px; }
+        .resources {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 8px;
             background: rgba(0,0,0,0.3);
             padding: 14px;
-            border-radius: 20px;
-            margin-bottom: 14px;
+            border-radius: 16px;
+            margin-bottom: 16px;
         }
-        .stat {
+        .res {
             text-align: center;
             background: rgba(255,255,255,0.06);
-            padding: 8px 4px;
+            padding: 8px;
             border-radius: 12px;
-            font-size: 14px;
         }
-        .stat .icon { font-size: 22px; display: block; }
-        .stat .value {
-            font-weight: bold;
-            font-size: 18px;
-            margin-top: 2px;
-        }
-        .stat .value.danger { color: #ff6b6b; }
-        .stat .value.good { color: #2ecc71; }
-        .stat .value.warning { color: #f39c12; }
-
-        .message-box {
+        .res .icon { font-size: 24px; display: block; }
+        .res .value { font-weight: bold; font-size: 18px; }
+        .res .value.danger { color: #ff6b6b; }
+        .message {
             background: rgba(0,0,0,0.4);
-            padding: 12px 16px;
-            border-radius: 16px;
+            padding: 12px;
+            border-radius: 14px;
             text-align: center;
-            font-size: 16px;
-            min-height: 54px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            min-height: 50px;
             margin-bottom: 16px;
             border-left: 4px solid #3498db;
         }
-        .message-box.dead {
-            border-left-color: #e74c3c;
-            background: rgba(231,76,60,0.2);
-        }
-
-        .actions-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-        .actions-grid button {
-            background: rgba(52,152,219,0.2);
-            border: 1px solid rgba(52,152,219,0.3);
-            color: #ecf0f1;
-            padding: 16px 8px;
-            border-radius: 16px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.15s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            -webkit-touch-callout: none;
-        }
-        .actions-grid button:active {
-            transform: scale(0.94);
-            background: rgba(52,152,219,0.4);
-        }
-        .actions-grid button .emoji { font-size: 28px; }
-        .actions-grid button:disabled {
-            opacity: 0.4;
-            transform: none;
-        }
-
-        .restart-btn {
-            margin-top: 16px;
+        .message.dead { border-left-color: #e74c3c; background: rgba(231,76,60,0.2); }
+        button {
             width: 100%;
             padding: 14px;
-            background: #e74c3c;
             border: none;
-            border-radius: 16px;
-            color: white;
+            border-radius: 14px;
             font-size: 18px;
             font-weight: bold;
             cursor: pointer;
             transition: 0.15s;
-            display: none;
+            margin-top: 8px;
         }
-        .restart-btn:active { transform: scale(0.96); }
-        .restart-btn.show { display: block; }
-
-        .day-badge {
+        button:active { transform: scale(0.96); }
+        .btn-next { background: #3498db; color: white; }
+        .btn-next:disabled { opacity: 0.4; }
+        .btn-restart { background: #e74c3c; color: white; display: none; }
+        .btn-restart.show { display: block; }
+        .hint {
+            font-size: 13px;
+            color: #95a5a6;
             text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 12px;
-            color: #74b9ff;
-        }
-
-        @media (max-width: 400px) {
-            .actions-grid button { font-size: 14px; padding: 12px 4px; }
-            .actions-grid button .emoji { font-size: 22px; }
-            .stat { font-size: 12px; }
-            .stat .icon { font-size: 18px; }
+            margin-top: 12px;
         }
     </style>
 </head>
 <body>
 <div class="container" id="app">
-    <h1>❄️ النجاة في الصقيع</h1>
-    <div class="day-badge" id="dayDisplay">📅 اليوم 1</div>
+    <h1>❄️ مدينة الجليد</h1>
+    <div class="day" id="dayDisplay">📅 اليوم 1</div>
 
-    <div class="status-grid" id="statusGrid">
-        <div class="stat"><span class="icon">❤️</span><span class="value" id="health">100</span></div>
-        <div class="stat"><span class="icon">🍖</span><span class="value" id="hunger">80</span></div>
-        <div class="stat"><span class="icon">💧</span><span class="value" id="thirst">80</span></div>
-        <div class="stat"><span class="icon">🔥</span><span class="value" id="temp">70</span></div>
-        <div class="stat"><span class="icon">🪵</span><span class="value" id="wood">5</span></div>
-        <div class="stat"><span class="icon">🥫</span><span class="value" id="food">3</span></div>
-        <div class="stat" style="grid-column: span 3;"><span class="icon">🚰</span><span class="value" id="water">3</span></div>
+    <div class="resources">
+        <div class="res"><span class="icon">🪵</span><span class="value" id="wood">20</span></div>
+        <div class="res"><span class="icon">🪨</span><span class="value" id="stone">15</span></div>
+        <div class="res"><span class="icon">🍖</span><span class="value" id="food">25</span></div>
+        <div class="res"><span class="icon">🔥</span><span class="value" id="heat">10</span></div>
     </div>
 
-    <div class="message-box" id="messageBox">❄️ ابدأ مغامرتك في البرد القارس</div>
+    <div class="message" id="messageBox">❄️ أهلاً بك في مدينة الجليد. قُد شعبك نحو البقاء!</div>
 
-    <div class="actions-grid" id="actionsGrid">
-        <button data-action="wood"><span class="emoji">🪵</span>حطب</button>
-        <button data-action="food"><span class="emoji">🍖</span>طعام</button>
-        <button data-action="water"><span class="emoji">💧</span>ذوبان ثلج</button>
-        <button data-action="fire"><span class="emoji">🔥</span>نار</button>
-        <button data-action="eat"><span class="emoji">🍽️</span>أكل</button>
-        <button data-action="drink"><span class="emoji">🥤</span>شرب</button>
-        <button data-action="wait" style="grid-column: span 2;"><span class="emoji">⏳</span>انتظار (مرر اليوم)</button>
-    </div>
+    <button class="btn-next" id="nextDayBtn">⏳ إنهاء اليوم</button>
+    <button class="btn-restart" id="restartBtn">🔄 بدء من جديد</button>
 
-    <button class="restart-btn" id="restartBtn">🔄 بدء لعبة جديدة</button>
+    <div class="hint" id="hint">اضغط "إنهاء اليوم" لتتقدم في اللعبة</div>
 </div>
 
 <script>
-    (function() {
-        // ----- حالة اللاعب -----
-        let player = {
-            health: 100,
-            hunger: 80,
-            thirst: 80,
-            temp: 70,
-            wood: 5,
-            food: 3,
-            water: 3,
+(function() {
+    // ----- حالة اللعبة -----
+    let state = {
+        wood: 20,
+        stone: 15,
+        food: 25,
+        heat: 10,
+        day: 1,
+        alive: true
+    };
+
+    // ----- عناصر DOM -----
+    const $ = id => document.getElementById(id);
+    const woodEl = $('wood');
+    const stoneEl = $('stone');
+    const foodEl = $('food');
+    const heatEl = $('heat');
+    const dayEl = $('dayDisplay');
+    const messageBox = $('messageBox');
+    const nextBtn = $('nextDayBtn');
+    const restartBtn = $('restartBtn');
+    const hintEl = $('hint');
+
+    // ----- تحديث الواجهة -----
+    function updateUI() {
+        woodEl.textContent = state.wood;
+        stoneEl.textContent = state.stone;
+        foodEl.textContent = state.food;
+        heatEl.textContent = state.heat;
+        dayEl.textContent = `📅 اليوم ${state.day}`;
+
+        // ألوان تحذيرية
+        [woodEl, stoneEl, foodEl, heatEl].forEach(el => {
+            const val = parseInt(el.textContent);
+            el.className = 'value' + (val <= 3 ? ' danger' : '');
+        });
+
+        // تعطيل الزر إذا كان ميتاً
+        nextBtn.disabled = !state.alive;
+
+        if (!state.alive) {
+            messageBox.className = 'message dead';
+            restartBtn.classList.add('show');
+            hintEl.textContent = '💀 لقد انتهت رحلتك...';
+        } else {
+            messageBox.className = 'message';
+            restartBtn.classList.remove('show');
+            hintEl.textContent = 'اضغط "إنهاء اليوم" لتتقدم في اللعبة';
+        }
+    }
+
+    // ----- عرض رسالة -----
+    function setMessage(text, isDead = false) {
+        messageBox.textContent = text;
+        if (isDead) messageBox.className = 'message dead';
+        else messageBox.className = 'message';
+    }
+
+    // ----- نهاية اللعبة -----
+    function gameOver(reason) {
+        state.alive = false;
+        setMessage(`💀 ${reason} بعد ${state.day} يوماً`, true);
+        updateUI();
+    }
+
+    // ----- إنهاء اليوم -----
+    function endDay() {
+        if (!state.alive) return;
+
+        // تناقص الموارد اليومي
+        state.food -= 2;   // استهلاك الطعام
+        state.heat -= 1;   // استهلاك الحطب للتدفئة
+
+        // حدود دنيا
+        state.food = Math.max(0, state.food);
+        state.heat = Math.max(0, state.heat);
+        state.wood = Math.max(0, state.wood);
+        state.stone = Math.max(0, state.stone);
+
+        // زيادة اليوم
+        state.day++;
+
+        // التحقق من الموت
+        if (state.food <= 0) {
+            gameOver('نفد الطعام، مات سكانك جوعاً');
+            return;
+        }
+        if (state.heat <= 0) {
+            gameOver('نفد الحطب، مات سكانك من البرد');
+            return;
+        }
+
+        // رسالة عشوائية للتحفيز
+        const msgs = [
+            '❄️ ليلة باردة أخرى، لكنك نجوت!',
+            '🌨️ تساقط الثلج طوال الليل، لكن مدينتك صامدة.',
+            '🔥 حافظت على النار مشتعلة، أحسنت!',
+            '⭐ ليلة هادئة تحت السماء المتجمدة.'
+        ];
+        setMessage(msgs[Math.floor(Math.random() * msgs.length)]);
+
+        updateUI();
+    }
+
+    // ----- إعادة التشغيل -----
+    function restartGame() {
+        state = {
+            wood: 20,
+            stone: 15,
+            food: 25,
+            heat: 10,
             day: 1,
             alive: true
         };
+        setMessage('❄️ بدأت رحلة جديدة في مدينة الجليد');
+        updateUI();
+    }
 
-        // ----- عناصر DOM -----
-        const $ = id => document.getElementById(id);
-        const healthEl = $('health');
-        const hungerEl = $('hunger');
-        const thirstEl = $('thirst');
-        const tempEl = $('temp');
-        const woodEl = $('wood');
-        const foodEl = $('food');
-        const waterEl = $('water');
-        const dayEl = $('dayDisplay');
-        const messageBox = $('messageBox');
-        const actionsGrid = $('actionsGrid');
-        const restartBtn = $('restartBtn');
+    // ----- ربط الأزرار -----
+    nextBtn.addEventListener('click', endDay);
+    restartBtn.addEventListener('click', restartGame);
 
-        // ----- تحديث الواجهة -----
-        function updateUI() {
-            healthEl.textContent = player.health;
-            hungerEl.textContent = player.hunger;
-            thirstEl.textContent = player.thirst;
-            tempEl.textContent = player.temp;
-            woodEl.textContent = player.wood;
-            foodEl.textContent = player.food;
-            waterEl.textContent = player.water;
-            dayEl.textContent = `📅 اليوم ${player.day}`;
-
-            // ألوان تحذيرية
-            [healthEl, hungerEl, thirstEl, tempEl].forEach(el => {
-                const val = parseInt(el.textContent);
-                el.className = 'value' + (val <= 20 ? ' danger' : val <= 45 ? ' warning' : ' good');
-            });
-
-            // تعطيل الأزرار إذا كان ميتاً
-            document.querySelectorAll('.actions-grid button').forEach(btn => {
-                btn.disabled = !player.alive;
-            });
-
-            // رسالة الموت
-            if (!player.alive) {
-                messageBox.className = 'message-box dead';
-                restartBtn.classList.add('show');
-            } else {
-                messageBox.className = 'message-box';
-                restartBtn.classList.remove('show');
-            }
-        }
-
-        // ----- عرض رسالة -----
-        function setMessage(text, isDead = false) {
-            messageBox.textContent = text;
-            if (isDead) messageBox.className = 'message-box dead';
-            else messageBox.className = 'message-box';
-        }
-
-        // ----- نهاية اللعبة -----
-        function gameOver() {
-            player.alive = false;
-            setMessage(`💀 لقد مت بعد ${player.day} يوماً في الصقيع`, true);
-            updateUI();
-        }
-
-        // ----- تناقص يومي + فحص الموت -----
-        function dailyDecay() {
-            if (!player.alive) return;
-
-            player.hunger -= Math.floor(Math.random() * 8) + 5;
-            player.thirst -= Math.floor(Math.random() * 8) + 5;
-            if (Math.random() < 0.6) {
-                player.temp -= Math.floor(Math.random() * 6) + 3;
-            }
-
-            // تأثير العوامل على الصحة
-            if (player.hunger < 30) player.health -= 5;
-            if (player.thirst < 30) player.health -= 5;
-            if (player.temp < 30) player.health -= 8;
-
-            // حدود دنيا
-            player.hunger = Math.max(0, player.hunger);
-            player.thirst = Math.max(0, player.thirst);
-            player.temp = Math.max(0, player.temp);
-            player.health = Math.max(0, player.health);
-
-            player.day++;
-
-            if (player.health <= 0 || player.hunger <= 0 || player.thirst <= 0) {
-                gameOver();
-            }
-
-            updateUI();
-        }
-
-        // ----- تنفيذ إجراء -----
-        function performAction(action) {
-            if (!player.alive) return;
-
-            let msg = '';
-
-            switch (action) {
-                case 'wood': {
-                    const found = Math.floor(Math.random() * 4) + 1;
-                    player.wood += found;
-                    msg = `🪵 وجدت ${found} قطعة حطب`;
-                    break;
-                }
-                case 'food': {
-                    if (Math.random() < 0.5) {
-                        const found = Math.floor(Math.random() * 3) + 1;
-                        player.food += found;
-                        msg = `🍖 وجدت ${found} وحدة طعام`;
-                    } else {
-                        msg = '❌ لم تجد طعاماً، الجو قاسٍ';
-                    }
-                    break;
-                }
-                case 'water': {
-                    const found = Math.floor(Math.random() * 3) + 1;
-                    player.water += found;
-                    msg = `💧 أذبت ثلجاً وحصلت على ${found} ماء`;
-                    break;
-                }
-                case 'fire': {
-                    if (player.wood >= 2) {
-                        player.wood -= 2;
-                        player.temp = Math.min(100, player.temp + 20);
-                        msg = '🔥 أشعلت ناراً، ارتفعت حرارتك';
-                    } else {
-                        msg = '⚠️ ليس لديك حطب كافٍ (تحتاج 2)';
-                        setMessage(msg);
-                        updateUI();
-                        return;
-                    }
-                    break;
-                }
-                case 'eat': {
-                    if (player.food > 0) {
-                        player.food--;
-                        player.hunger = Math.min(100, player.hunger + 20);
-                        msg = '🍽️ أكلت طعاماً، انخفض جوعك';
-                    } else {
-                        msg = '⚠️ ليس لديك طعام!';
-                        setMessage(msg);
-                        updateUI();
-                        return;
-                    }
-                    break;
-                }
-                case 'drink': {
-                    if (player.water > 0) {
-                        player.water--;
-                        player.thirst = Math.min(100, player.thirst + 20);
-                        msg = '🥤 شربت ماءً، انخفض عطشك';
-                    } else {
-                        msg = '⚠️ ليس لديك ماء!';
-                        setMessage(msg);
-                        updateUI();
-                        return;
-                    }
-                    break;
-                }
-                case 'wait': {
-                    msg = '⏳ مررتَ اليوم دون فعل شيء...';
-                    break;
-                }
-                default: return;
-            }
-
-            setMessage(msg);
-            dailyDecay();
-        }
-
-        // ----- إعادة تشغيل اللعبة -----
-        function restartGame() {
-            player = {
-                health: 100,
-                hunger: 80,
-                thirst: 80,
-                temp: 70,
-                wood: 5,
-                food: 3,
-                water: 3,
-                day: 1,
-                alive: true
-            };
-            setMessage('❄️ بدأت رحلة جديدة في الصقيع');
-            updateUI();
-        }
-
-        // ----- ربط الأزرار -----
-        function bindEvents() {
-            document.querySelectorAll('.actions-grid button').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    const action = this.dataset.action;
-                    performAction(action);
-                });
-                // منع التحديد أثناء الضغط على الجوال
-                btn.addEventListener('touchstart', function(e) {
-                    // لا شيء، فقط لمنع الـ double-tap zoom
-                }, { passive: true });
-            });
-
-            restartBtn.addEventListener('click', restartGame);
-            restartBtn.addEventListener('touchstart', function(e) {
-                // منع السلوك الافتراضي
-            }, { passive: true });
-        }
-
-        // ----- تهيئة -----
-        function init() {
-            updateUI();
-            setMessage('❄️ ابدأ مغامرتك في البرد القارس');
-            bindEvents();
-        }
-
-        init();
-    })();
+    // ----- تهيئة -----
+    updateUI();
+    setMessage('❄️ أهلاً بك في مدينة الجليد. قُد شعبك نحو البقاء!');
+})();
 </script>
 </body>
 </html>
