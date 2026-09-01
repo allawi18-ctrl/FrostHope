@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>❄️ مملكة الجليد</title>
+    <title>❄️ مملكة الجليد: البقاء</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
@@ -11,124 +11,258 @@
             background: linear-gradient(145deg, #0b1a2e, #1a2f3f);
             color: #ecf0f1;
             min-height: 100vh;
-            padding: 12px;
+            padding: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
         }
         .container {
-            max-width: 450px;
+            max-width: 500px;
             width: 100%;
             background: rgba(255,255,255,0.06);
             backdrop-filter: blur(12px);
             border-radius: 28px;
-            padding: 18px 16px;
+            padding: 16px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.7);
             border: 1px solid rgba(255,255,255,0.08);
         }
-        h1 { text-align: center; font-size: 24px; margin-bottom: 12px; letter-spacing: 1px; }
-        .day { text-align: center; font-size: 18px; color: #74b9ff; margin-bottom: 14px; }
+        h1 { text-align: center; font-size: 22px; margin-bottom: 10px; }
+        .day { text-align: center; font-size: 16px; color: #74b9ff; margin-bottom: 12px; }
+        
+        /* الموارد */
         .resources {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
             background: rgba(0,0,0,0.3);
-            padding: 12px;
-            border-radius: 16px;
-            margin-bottom: 14px;
+            padding: 8px;
+            border-radius: 14px;
+            margin-bottom: 12px;
         }
         .res {
             text-align: center;
             background: rgba(255,255,255,0.06);
-            padding: 6px 4px;
-            border-radius: 10px;
-            font-size: 13px;
+            padding: 4px 2px;
+            border-radius: 8px;
+            font-size: 11px;
         }
-        .res .icon { font-size: 20px; display: block; }
-        .res .value { font-weight: bold; font-size: 16px; }
+        .res .icon { font-size: 16px; display: block; }
+        .res .value { font-weight: bold; font-size: 14px; }
         .res .value.danger { color: #ff6b6b; }
+        .res .value.gold { color: #f1c40f; }
 
-        .buildings {
+        /* التبويبات */
+        .tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+            margin-bottom: 12px;
+        }
+        .tabs button {
+            padding: 8px 4px;
+            border: none;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            background: rgba(255,255,255,0.08);
+            color: #bdc3c7;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .tabs button.active {
+            background: #3498db;
+            color: white;
+        }
+        .tabs button:active { transform: scale(0.95); }
+
+        /* المحتوى */
+        .tab-content {
+            display: none;
+            background: rgba(0,0,0,0.2);
+            padding: 12px;
+            border-radius: 14px;
+            min-height: 200px;
+            margin-bottom: 12px;
+        }
+        .tab-content.active { display: block; }
+
+        /* الخريطة */
+        .map {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 4px;
+        }
+        .map-cell {
+            aspect-ratio: 1;
+            background: rgba(255,255,255,0.08);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+            padding: 2px;
+        }
+        .map-cell:active { transform: scale(0.92); }
+        .map-cell .emoji { font-size: 20px; }
+        .map-cell .name { font-size: 8px; color: #bdc3c7; }
+        .map-cell.explored { background: rgba(52,152,219,0.2); border-color: #3498db; }
+        .map-cell.current { background: rgba(46,204,113,0.3); border-color: #2ecc71; }
+        .map-cell.enemy { background: rgba(231,76,60,0.2); border-color: #e74c3c; }
+        .map-cell.resource { background: rgba(241,196,15,0.15); border-color: #f1c40f; }
+
+        /* المباني */
+        .buildings-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 8px;
-            margin-bottom: 14px;
         }
-        .building {
+        .building-card {
             background: rgba(255,255,255,0.06);
-            padding: 10px 8px;
+            padding: 10px;
             border-radius: 12px;
             text-align: center;
             border: 1px solid rgba(255,255,255,0.05);
         }
-        .building .name { font-weight: bold; font-size: 15px; }
-        .building .level { font-size: 12px; color: #bdc3c7; }
-        .building .cost { font-size: 11px; color: #95a5a6; margin-top: 4px; }
-        .building button {
-            margin-top: 6px;
+        .building-card .name { font-weight: bold; font-size: 14px; }
+        .building-card .level { font-size: 11px; color: #bdc3c7; }
+        .building-card .cost { font-size: 10px; color: #95a5a6; margin: 4px 0; }
+        .building-card button {
             padding: 6px 12px;
             border: none;
             border-radius: 8px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
             background: #3498db;
             color: white;
             cursor: pointer;
             width: 100%;
         }
-        .building button:active { transform: scale(0.95); }
-        .building button:disabled { opacity: 0.4; }
+        .building-card button:active { transform: scale(0.95); }
+        .building-card button:disabled { opacity: 0.4; }
 
-        .message {
-            background: rgba(0,0,0,0.4);
-            padding: 10px 12px;
-            border-radius: 12px;
-            text-align: center;
-            min-height: 44px;
-            font-size: 14px;
-            margin-bottom: 12px;
-            border-left: 4px solid #3498db;
-        }
-        .message.dead { border-left-color: #e74c3c; background: rgba(231,76,60,0.2); }
-
-        .actions {
+        /* المتجر */
+        .shop-items {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 8px;
         }
-        .actions button {
-            padding: 12px;
-            border: none;
+        .shop-item {
+            background: rgba(255,255,255,0.06);
+            padding: 10px;
             border-radius: 12px;
-            font-size: 16px;
+            text-align: center;
+            border: 1px solid rgba(241,196,15,0.2);
+        }
+        .shop-item .price { color: #f1c40f; font-weight: bold; }
+        .shop-item button {
+            margin-top: 6px;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            background: #f1c40f;
+            color: #1a2f3f;
+            cursor: pointer;
+            width: 100%;
+        }
+        .shop-item button:active { transform: scale(0.95); }
+
+        /* التكنولوجيا */
+        .tech-tree {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+        .tech-item {
+            background: rgba(255,255,255,0.06);
+            padding: 8px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+            font-size: 12px;
+        }
+        .tech-item .name { font-weight: bold; }
+        .tech-item .status { font-size: 10px; color: #95a5a6; }
+        .tech-item button {
+            margin-top: 4px;
+            padding: 4px 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            background: #9b59b6;
+            color: white;
+            cursor: pointer;
+        }
+        .tech-item button:active { transform: scale(0.95); }
+        .tech-item button:disabled { opacity: 0.4; }
+        .tech-item.unlocked { border-color: #2ecc71; }
+        .tech-item.unlocked .status { color: #2ecc71; }
+
+        /* الرسالة */
+        .message {
+            background: rgba(0,0,0,0.4);
+            padding: 8px 12px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 13px;
+            margin-bottom: 10px;
+            border-left: 4px solid #3498db;
+            min-height: 38px;
+        }
+        .message.dead { border-left-color: #e74c3c; background: rgba(231,76,60,0.2); }
+
+        /* الأزرار السفلية */
+        .bottom-actions {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 6px;
+        }
+        .bottom-actions button {
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
             transition: 0.1s;
         }
-        .actions button:active { transform: scale(0.95); }
-        .btn-next { background: #3498db; color: white; grid-column: span 2; }
-        .btn-restart { background: #e74c3c; color: white; grid-column: span 2; display: none; }
-        .btn-restart.show { display: block; }
+        .bottom-actions button:active { transform: scale(0.95); }
+        .btn-next { background: #3498db; color: white; }
         .btn-save { background: #2ecc71; color: white; }
-        .btn-reset { background: #e67e22; color: white; }
+        .btn-restart { background: #e74c3c; color: white; }
+        .btn-restart.hidden { display: none; }
 
         .hint {
-            font-size: 12px;
+            font-size: 11px;
             color: #95a5a6;
             text-align: center;
-            margin-top: 10px;
+            margin-top: 8px;
         }
+
         @media (max-width: 400px) {
-            .resources { grid-template-columns: repeat(3, 1fr); }
-            .buildings { grid-template-columns: 1fr 1fr; }
+            .resources { grid-template-columns: repeat(4, 1fr); }
+            .res { font-size: 10px; }
+            .res .icon { font-size: 14px; }
+            .res .value { font-size: 12px; }
+            .map-cell .emoji { font-size: 16px; }
+            .buildings-grid { grid-template-columns: 1fr 1fr; }
+            .shop-items { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
 <body>
-<div class="container" id="app">
+<div class="container">
     <h1>❄️ مملكة الجليد</h1>
     <div class="day" id="dayDisplay">📅 اليوم 1</div>
 
+    <!-- الموارد -->
     <div class="resources" id="resources">
         <div class="res"><span class="icon">🪵</span><span class="value" id="wood">20</span></div>
         <div class="res"><span class="icon">🪨</span><span class="value" id="stone">15</span></div>
@@ -136,61 +270,89 @@
         <div class="res"><span class="icon">🔥</span><span class="value" id="heat">10</span></div>
         <div class="res"><span class="icon">👥</span><span class="value" id="population">4</span></div>
         <div class="res"><span class="icon">⚔️</span><span class="value" id="soldiers">2</span></div>
+        <div class="res"><span class="icon">💎</span><span class="value gold" id="crystals">5</span></div>
+        <div class="res"><span class="icon">🏆</span><span class="value" id="level">1</span></div>
     </div>
 
-    <div class="buildings" id="buildings">
-        <div class="building" data-building="house">
-            <div class="name">🏠 منزل</div>
-            <div class="level">المستوى 1</div>
-            <div class="cost">🪵5 🪨3</div>
-            <button data-action="build">بناء</button>
-        </div>
-        <div class="building" data-building="storage">
-            <div class="name">🏛️ مخزن</div>
-            <div class="level">المستوى 1</div>
-            <div class="cost">🪵8 🪨5</div>
-            <button data-action="build">بناء</button>
-        </div>
-        <div class="building" data-building="workshop">
-            <div class="name">🔨 ورشة</div>
-            <div class="level">المستوى 1</div>
-            <div class="cost">🪵10 🪨7</div>
-            <button data-action="build">بناء</button>
-        </div>
-        <div class="building" data-building="barracks">
-            <div class="name">⚔️ ثكنة</div>
-            <div class="level">المستوى 1</div>
-            <div class="cost">🪵12 🪨10</div>
-            <button data-action="build">بناء</button>
+    <!-- التبويبات -->
+    <div class="tabs">
+        <button class="active" data-tab="map">🗺️ خريطة</button>
+        <button data-tab="buildings">🏗️ مباني</button>
+        <button data-tab="shop">💎 متجر</button>
+        <button data-tab="tech">🔬 تقنية</button>
+    </div>
+
+    <!-- محتوى التبويبات -->
+    <div class="tab-content active" id="tab-map">
+        <div class="map" id="mapContainer"></div>
+        <div style="margin-top:8px;font-size:12px;color:#95a5a6;text-align:center;">
+            🟢 أنت هنا | 🟡 موارد | 🔴 أعداء | ⬜ غير مكتشف
         </div>
     </div>
 
+    <div class="tab-content" id="tab-buildings">
+        <div class="buildings-grid" id="buildingsContainer"></div>
+    </div>
+
+    <div class="tab-content" id="tab-shop">
+        <div class="shop-items" id="shopContainer"></div>
+    </div>
+
+    <div class="tab-content" id="tab-tech">
+        <div class="tech-tree" id="techContainer"></div>
+    </div>
+
+    <!-- الرسالة -->
     <div class="message" id="messageBox">❄️ أهلاً بك في مملكة الجليد!</div>
 
-    <div class="actions">
+    <!-- الأزرار السفلية -->
+    <div class="bottom-actions">
         <button class="btn-next" id="nextDayBtn">⏳ إنهاء اليوم</button>
         <button class="btn-save" id="saveBtn">💾 حفظ</button>
-        <button class="btn-restart" id="restartBtn">🔄 بدء جديد</button>
+        <button class="btn-restart hidden" id="restartBtn">🔄 جديد</button>
     </div>
-    <div class="hint" id="hint">اضغط "إنهاء اليوم" للتقدم</div>
+    <div class="hint" id="hint">استكشف الخريطة، ابنِ مدينتك، وطور مملكتك</div>
 </div>
 
 <script>
 (function() {
-    // ----- حالة اللعبة -----
+    // ----- الحالة الأولية -----
     let state = {
         wood: 20, stone: 15, food: 25, heat: 10,
-        population: 4, soldiers: 2,
+        population: 4, soldiers: 2, crystals: 5, level: 1,
+        day: 1, alive: true,
         buildings: {
             house: { level: 1, built: true },
             storage: { level: 1, built: false },
             workshop: { level: 1, built: false },
             barracks: { level: 1, built: false }
         },
-        day: 1,
-        alive: true
+        tech: {
+            hunting: { unlocked: false, cost: 5 },
+            building: { unlocked: false, cost: 8 },
+            forging: { unlocked: false, cost: 10 },
+            defense: { unlocked: false, cost: 12 }
+        },
+        map: {
+            // 5x5 شبكة: 0=غير مكتشف, 1=مكتشف, 2=أنت, 3=موارد, 4=أعداء
+            grid: [
+                [0,0,0,0,0],
+                [0,0,0,0,0],
+                [0,0,2,0,0],
+                [0,0,0,0,0],
+                [0,0,0,0,0]
+            ],
+            resources: {
+                // موارد عشوائية في المناطق
+            },
+            enemies: {
+                // أعداء عشوائيون
+            }
+        },
+        explored: 1
     };
 
+    // تكاليف المباني
     const buildingCosts = {
         house: { wood: 5, stone: 3 },
         storage: { wood: 8, stone: 5 },
@@ -198,20 +360,24 @@
         barracks: { wood: 12, stone: 10 }
     };
 
-    // ----- عناصر DOM -----
+    // بيانات الخريطة
+    const mapData = {
+        types: ['غابة', 'جبل', 'سهول', 'بحيرة', 'مدينة مهجورة'],
+        emojis: ['🌲', '⛰️', '🌾', '🌊', '🏚️']
+    };
+
+    // عناصر DOM
     const $ = id => document.getElementById(id);
-    const woodEl = $('wood');
-    const stoneEl = $('stone');
-    const foodEl = $('food');
-    const heatEl = $('heat');
-    const popEl = $('population');
-    const soldiersEl = $('soldiers');
-    const dayEl = $('dayDisplay');
-    const messageBox = $('messageBox');
-    const nextBtn = $('nextDayBtn');
-    const restartBtn = $('restartBtn');
-    const saveBtn = $('saveBtn');
+    const woodEl = $('wood'), stoneEl = $('stone'), foodEl = $('food');
+    const heatEl = $('heat'), popEl = $('population'), soldiersEl = $('soldiers');
+    const crystalsEl = $('crystals'), levelEl = $('level');
+    const dayEl = $('dayDisplay'), messageBox = $('messageBox');
+    const nextBtn = $('nextDayBtn'), saveBtn = $('saveBtn'), restartBtn = $('restartBtn');
     const hintEl = $('hint');
+    const mapContainer = $('mapContainer');
+    const buildingsContainer = $('buildingsContainer');
+    const shopContainer = $('shopContainer');
+    const techContainer = $('techContainer');
 
     // ----- تحديث الواجهة -----
     function updateUI() {
@@ -221,6 +387,8 @@
         heatEl.textContent = state.heat;
         popEl.textContent = state.population;
         soldiersEl.textContent = state.soldiers;
+        crystalsEl.textContent = state.crystals;
+        levelEl.textContent = state.level;
         dayEl.textContent = `📅 اليوم ${state.day}`;
 
         // ألوان تحذيرية
@@ -229,48 +397,22 @@
             el.className = 'value' + (val <= 3 ? ' danger' : '');
         });
 
-        // تحديث المباني
-        document.querySelectorAll('.building').forEach(el => {
-            const type = el.dataset.building;
-            const b = state.buildings[type];
-            const btn = el.querySelector('button');
-            const levelEl = el.querySelector('.level');
-            const costEl = el.querySelector('.cost');
-
-            if (b.built) {
-                levelEl.textContent = `المستوى ${b.level}`;
-                btn.textContent = 'ترقية';
-                btn.disabled = false;
-                const cost = buildingCosts[type];
-                const woodCost = cost.wood * b.level;
-                const stoneCost = cost.stone * b.level;
-                costEl.textContent = `🪵${woodCost} 🪨${stoneCost}`;
-                if (state.wood < woodCost || state.stone < stoneCost) {
-                    btn.disabled = true;
-                }
-            } else {
-                levelEl.textContent = 'غير مبني';
-                btn.textContent = 'بناء';
-                const cost = buildingCosts[type];
-                costEl.textContent = `🪵${cost.wood} 🪨${cost.stone}`;
-                if (state.wood < cost.wood || state.stone < cost.stone) {
-                    btn.disabled = true;
-                } else {
-                    btn.disabled = false;
-                }
-            }
-        });
-
-        nextBtn.disabled = !state.alive;
         if (!state.alive) {
             messageBox.className = 'message dead';
-            restartBtn.classList.add('show');
+            restartBtn.classList.remove('hidden');
             hintEl.textContent = '💀 انتهت رحلتك...';
+            nextBtn.disabled = true;
         } else {
             messageBox.className = 'message';
-            restartBtn.classList.remove('show');
-            hintEl.textContent = 'اضغط "إنهاء اليوم" للتقدم';
+            restartBtn.classList.add('hidden');
+            hintEl.textContent = 'استكشف الخريطة، ابنِ مدينتك، وطور مملكتك';
+            nextBtn.disabled = false;
         }
+
+        renderMap();
+        renderBuildings();
+        renderShop();
+        renderTech();
     }
 
     // ----- عرض رسالة -----
@@ -285,6 +427,177 @@
         state.alive = false;
         setMessage(`💀 ${reason} بعد ${state.day} يوماً`, true);
         updateUI();
+    }
+
+    // ----- توليد الخريطة العشوائية -----
+    function generateMap() {
+        const grid = [];
+        for (let r = 0; r < 5; r++) {
+            grid[r] = [];
+            for (let c = 0; c < 5; c++) {
+                grid[r][c] = 0;
+            }
+        }
+        grid[2][2] = 2; // موقع اللاعب
+
+        // وضع موارد عشوائية
+        const resourcePositions = [];
+        const enemyPositions = [];
+        for (let i = 0; i < 8; i++) {
+            let r, c;
+            do {
+                r = Math.floor(Math.random() * 5);
+                c = Math.floor(Math.random() * 5);
+            } while (grid[r][c] !== 0);
+            grid[r][c] = 3;
+            resourcePositions.push({r, c, type: Math.floor(Math.random() * 5)});
+        }
+        for (let i = 0; i < 4; i++) {
+            let r, c;
+            do {
+                r = Math.floor(Math.random() * 5);
+                c = Math.floor(Math.random() * 5);
+            } while (grid[r][c] !== 0);
+            grid[r][c] = 4;
+            enemyPositions.push({r, c, health: 20 + Math.floor(Math.random() * 20)});
+        }
+
+        state.map.grid = grid;
+        state.map.resources = resourcePositions;
+        state.map.enemies = enemyPositions;
+    }
+
+    // ----- عرض الخريطة -----
+    function renderMap() {
+        const grid = state.map.grid;
+        let html = '';
+        for (let r = 0; r < 5; r++) {
+            for (let c = 0; c < 5; c++) {
+                const cell = grid[r][c];
+                let cls = 'map-cell';
+                let emoji = '⬜';
+                let name = 'غير مكتشف';
+
+                if (cell === 2) {
+                    cls += ' current';
+                    emoji = '🌟';
+                    name = 'أنت هنا';
+                } else if (cell === 3) {
+                    cls += ' resource';
+                    const res = state.map.resources.find(p => p.r === r && p.c === c);
+                    emoji = mapData.emojis[res ? res.type : 0];
+                    name = mapData.types[res ? res.type : 0];
+                } else if (cell === 4) {
+                    cls += ' enemy';
+                    emoji = '⚔️';
+                    name = 'عدو';
+                } else if (cell === 1) {
+                    cls += ' explored';
+                    emoji = '🔍';
+                    name = 'مستكشف';
+                }
+
+                html += `<div class="${cls}" data-r="${r}" data-c="${c}">
+                    <span class="emoji">${emoji}</span>
+                    <span class="name">${name}</span>
+                </div>`;
+            }
+        }
+        mapContainer.innerHTML = html;
+
+        // إضافة حدث النقر على الخلايا
+        document.querySelectorAll('.map-cell').forEach(el => {
+            el.addEventListener('click', function() {
+                const r = parseInt(this.dataset.r);
+                const c = parseInt(this.dataset.c);
+                exploreCell(r, c);
+            });
+        });
+    }
+
+    // ----- استكشاف منطقة -----
+    function exploreCell(r, c) {
+        if (!state.alive) return;
+        const cell = state.map.grid[r][c];
+        if (cell === 0) {
+            // استكشاف منطقة جديدة
+            state.map.grid[r][c] = 1;
+            state.explored++;
+            // مكافأة استكشاف
+            const reward = Math.floor(Math.random() * 5) + 1;
+            state.wood += reward;
+            state.stone += reward;
+            setMessage(`🔍 استكشفت منطقة جديدة! حصلت على ${reward} خشب وحجر`);
+            updateUI();
+        } else if (cell === 3) {
+            // جمع موارد
+            const res = state.map.resources.find(p => p.r === r && p.c === c);
+            if (res) {
+                const amount = Math.floor(Math.random() * 5) + 3;
+                state.wood += amount;
+                state.stone += amount;
+                state.food += amount;
+                state.map.grid[r][c] = 1;
+                setMessage(`🌾 جمعت ${amount} من الموارد!`);
+                updateUI();
+            }
+        } else if (cell === 4) {
+            // قتال عدو
+            const enemy = state.map.enemies.find(p => p.r === r && p.c === c);
+            if (enemy) {
+                const power = state.soldiers * 3 + Math.floor(Math.random() * 5);
+                if (power > enemy.health) {
+                    state.map.grid[r][c] = 1;
+                    const reward = Math.floor(Math.random() * 10) + 5;
+                    state.crystals += Math.floor(reward / 2);
+                    state.food += reward;
+                    setMessage(`⚔️ هزمت العدو! حصلت على ${reward} طعام و ${Math.floor(reward/2)} كريستال`);
+                } else {
+                    state.health -= 10;
+                    setMessage(`⚔️ خسرت المعركة! خسرت 10 صحة`);
+                    if (state.health <= 0) gameOver('هزمك العدو');
+                }
+                updateUI();
+            }
+        } else {
+            setMessage('📍 هذه المنطقة مستكشفة بالفعل');
+        }
+    }
+
+    // ----- عرض المباني -----
+    function renderBuildings() {
+        let html = '';
+        for (const [key, b] of Object.entries(state.buildings)) {
+            const cost = buildingCosts[key];
+            const woodCost = b.built ? cost.wood * b.level : cost.wood;
+            const stoneCost = b.built ? cost.stone * b.level : cost.stone;
+            const canAfford = state.wood >= woodCost && state.stone >= stoneCost;
+            const names = {
+                house: '🏠 منزل',
+                storage: '🏛️ مخزن',
+                workshop: '🔨 ورشة',
+                barracks: '⚔️ ثكنة'
+            };
+
+            html += `
+                <div class="building-card">
+                    <div class="name">${names[key]}</div>
+                    <div class="level">${b.built ? `المستوى ${b.level}` : 'غير مبني'}</div>
+                    <div class="cost">🪵${woodCost} 🪨${stoneCost}</div>
+                    <button data-building="${key}" ${!canAfford || !state.alive ? 'disabled' : ''}>
+                        ${b.built ? 'ترقية' : 'بناء'}
+                    </button>
+                </div>
+            `;
+        }
+        buildingsContainer.innerHTML = html;
+
+        document.querySelectorAll('#buildingsContainer button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const type = this.dataset.building;
+                buildBuilding(type);
+            });
+        });
     }
 
     // ----- بناء أو ترقية مبنى -----
@@ -310,11 +623,114 @@
             b.built = true;
             b.level = 1;
             setMessage(`✅ تم بناء ${type}`);
-            // تأثير المباني
             if (type === 'house') state.population += 2;
             if (type === 'barracks') state.soldiers += 2;
         }
+        updateUI();
+    }
 
+    // ----- عرض المتجر -----
+    function renderShop() {
+        const items = [
+            { name: 'حزمة خشب', cost: 3, reward: 'wood', amount: 15 },
+            { name: 'حزمة حجر', cost: 3, reward: 'stone', amount: 12 },
+            { name: 'حزمة طعام', cost: 4, reward: 'food', amount: 20 },
+            { name: 'حزمة حطب', cost: 2, reward: 'heat', amount: 10 }
+        ];
+        let html = '';
+        items.forEach(item => {
+            html += `
+                <div class="shop-item">
+                    <div>${item.name}</div>
+                    <div class="price">💎 ${item.cost}</div>
+                    <button data-shop="${item.reward}" data-amount="${item.amount}" data-cost="${item.cost}">
+                        شراء
+                    </button>
+                </div>
+            `;
+        });
+        shopContainer.innerHTML = html;
+
+        document.querySelectorAll('#shopContainer button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const reward = this.dataset.shop;
+                const amount = parseInt(this.dataset.amount);
+                const cost = parseInt(this.dataset.cost);
+                buyItem(reward, amount, cost);
+            });
+        });
+    }
+
+    // ----- شراء من المتجر -----
+    function buyItem(reward, amount, cost) {
+        if (!state.alive) return;
+        if (state.crystals < cost) {
+            setMessage('⚠️ ليس لديك كريستالات كافية!');
+            return;
+        }
+        state.crystals -= cost;
+        state[reward] += amount;
+        setMessage(`✅ تم شراء ${amount} من ${reward}`);
+        updateUI();
+    }
+
+    // ----- عرض التكنولوجيا -----
+    function renderTech() {
+        let html = '';
+        const techNames = {
+            hunting: '🎯 صيد متقدم',
+            building: '🏗️ بناء محسن',
+            forging: '⚒️ حدادة',
+            defense: '🛡️ دفاع'
+        };
+        const techEffects = {
+            hunting: '🍖 +50% إنتاج طعام',
+            building: '🪵 -20% تكلفة بناء',
+            forging: '⚔️ +30% قوة جنود',
+            defense: '🛡️ -30% خسائر القتال'
+        };
+
+        for (const [key, t] of Object.entries(state.tech)) {
+            const unlocked = t.unlocked;
+            const cost = t.cost;
+            html += `
+                <div class="tech-item ${unlocked ? 'unlocked' : ''}">
+                    <div class="name">${techNames[key]}</div>
+                    <div class="status">${unlocked ? '✅ مفتوح' : `💎 ${cost}`}</div>
+                    <div style="font-size:10px;color:#95a5a6;">${techEffects[key]}</div>
+                    <button data-tech="${key}" ${unlocked || state.crystals < cost || !state.alive ? 'disabled' : ''}>
+                        ${unlocked ? 'مفعل' : 'فتح'}
+                    </button>
+                </div>
+            `;
+        }
+        techContainer.innerHTML = html;
+
+        document.querySelectorAll('#techContainer button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tech = this.dataset.tech;
+                unlockTech(tech);
+            });
+        });
+    }
+
+    // ----- فتح تقنية -----
+    function unlockTech(tech) {
+        if (!state.alive) return;
+        const t = state.tech[tech];
+        if (t.unlocked) return;
+        if (state.crystals < t.cost) {
+            setMessage('⚠️ ليس لديك كريستالات كافية!');
+            return;
+        }
+        state.crystals -= t.cost;
+        t.unlocked = true;
+        setMessage(`✅ تم فتح تقنية ${tech}`);
+        // تأثيرات التقنية
+        if (tech === 'hunting') state.food += 10;
+        if (tech === 'building') state.wood += 15;
+        if (tech === 'forging') state.soldiers += 3;
+        if (tech === 'defense') state.level++;
         updateUI();
     }
 
@@ -322,32 +738,30 @@
     function endDay() {
         if (!state.alive) return;
 
-        // استهلاك الموارد
         const foodConsumption = 2 + Math.floor(state.population / 2);
         const heatConsumption = 1 + Math.floor(state.population / 4);
 
         state.food -= foodConsumption;
         state.heat -= heatConsumption;
 
-        // إنتاج الموارد من المباني
+        // إنتاج الموارد
         if (state.buildings.workshop.built) {
             state.wood += state.buildings.workshop.level;
             state.stone += state.buildings.workshop.level;
         }
+        if (state.tech.hunting.unlocked) state.food += 5;
+        if (state.tech.building.unlocked) state.wood += 3;
 
-        // حدود دنيا
         state.food = Math.max(0, state.food);
         state.heat = Math.max(0, state.heat);
         state.wood = Math.max(0, state.wood);
         state.stone = Math.max(0, state.stone);
-
         state.day++;
 
-        // التحقق من الموت
         if (state.food <= 0) { gameOver('نفد الطعام'); return; }
         if (state.heat <= 0) { gameOver('نفد الحطب'); return; }
 
-        // أحداث عشوائية
+        // حدث عشوائي
         const events = [
             '❄️ ليلة باردة، لكنك نجوت!',
             '🌨️ تساقط ثلج كثيف، مدينة صامدة.',
@@ -356,20 +770,19 @@
             '💨 رياح قوية، لكن مدينتك قوية.'
         ];
         setMessage(events[Math.floor(Math.random() * events.length)]);
-
         updateUI();
     }
 
     // ----- حفظ اللعبة -----
     function saveGame() {
         if (!state.alive) return;
-        localStorage.setItem('frostKingdomSave', JSON.stringify(state));
+        localStorage.setItem('frostKingdomSurvivalSave', JSON.stringify(state));
         setMessage('💾 تم حفظ اللعبة!');
     }
 
     // ----- تحميل اللعبة -----
     function loadGame() {
-        const saved = localStorage.getItem('frostKingdomSave');
+        const saved = localStorage.getItem('frostKingdomSurvivalSave');
         if (saved) {
             try {
                 state = JSON.parse(saved);
@@ -384,38 +797,50 @@
     // ----- إعادة التشغيل -----
     function restartGame() {
         if (confirm('هل تريد بدء لعبة جديدة؟ سيتم فقدان التقدم الحالي.')) {
-            localStorage.removeItem('frostKingdomSave');
+            localStorage.removeItem('frostKingdomSurvivalSave');
             state = {
                 wood: 20, stone: 15, food: 25, heat: 10,
-                population: 4, soldiers: 2,
+                population: 4, soldiers: 2, crystals: 5, level: 1,
+                day: 1, alive: true,
                 buildings: {
                     house: { level: 1, built: true },
                     storage: { level: 1, built: false },
                     workshop: { level: 1, built: false },
                     barracks: { level: 1, built: false }
                 },
-                day: 1,
-                alive: true
+                tech: {
+                    hunting: { unlocked: false, cost: 5 },
+                    building: { unlocked: false, cost: 8 },
+                    forging: { unlocked: false, cost: 10 },
+                    defense: { unlocked: false, cost: 12 }
+                },
+                explored: 1
             };
+            generateMap();
             setMessage('🔄 بدأت رحلة جديدة!');
             updateUI();
         }
     }
 
-    // ----- ربط الأزرار -----
-    document.querySelectorAll('.building button').forEach(btn => {
+    // ----- التبويبات -----
+    document.querySelectorAll('.tabs button').forEach(btn => {
         btn.addEventListener('click', function() {
-            const type = this.closest('.building').dataset.building;
-            buildBuilding(type);
+            document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            const tabId = this.dataset.tab;
+            document.getElementById(`tab-${tabId}`).classList.add('active');
         });
     });
 
+    // ----- ربط الأزرار -----
     nextBtn.addEventListener('click', endDay);
     saveBtn.addEventListener('click', saveGame);
     restartBtn.addEventListener('click', restartGame);
 
-    // ----- تحميل اللعبة أو بدء جديدة -----
+    // ----- تهيئة -----
     if (!loadGame()) {
+        generateMap();
         setMessage('❄️ أهلاً بك في مملكة الجليد!');
     }
     updateUI();
@@ -423,10 +848,9 @@
     // حفظ تلقائي كل 30 ثانية
     setInterval(() => {
         if (state.alive) {
-            localStorage.setItem('frostKingdomSave', JSON.stringify(state));
+            localStorage.setItem('frostKingdomSurvivalSave', JSON.stringify(state));
         }
     }, 30000);
 })();
 </script>
-</body>
-</html>
+</
