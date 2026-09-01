@@ -1,0 +1,30 @@
+# EconomyManager.gd
+extends Node
+
+# الموارد الأساسية
+var wood: int = 100
+var coal: int = 50
+var heat_level: float = 100.0
+
+# معدلات الاستهلاك
+var coal_consumption_rate: float = 1.0
+var heat_drop_rate: float = 0.5
+
+func _process(delta: float) -> void:
+	_update_generator(delta)
+
+func _update_generator(delta: float) -> void:
+	if coal > 0:
+		coal -= coal_consumption_rate * delta
+		if heat_level < 100.0:
+			heat_level = min(100.0, heat_level + (1.0 * delta))
+	else:
+		heat_level = max(0.0, heat_level - (heat_drop_rate * delta))
+		if heat_level == 0.0:
+			print("تحذير: المعسكر يتجمد!")
+
+func add_resource(type: String, amount: int) -> void:
+	if type == "wood":
+		wood += amount
+	elif type == "coal":
+		coal += amount
