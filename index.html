@@ -2,107 +2,22 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FROST SURVIVAL - Professional</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>FrostHope Pro - Day Night</title>
+<script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@700;800&display=swap');
-*{font-family:'Cairo',sans-serif;box-sizing:border-box}
-body{margin:0;background:#050b14;color:#d8e6ff;overflow:hidden}
-#ui{position:absolute;top:0;left:0;right:0;height:64px;background:linear-gradient(#12233d,#0a1628);display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:2px solid #1e3d68;z-index:10}
-.res{display:flex;gap:14px;font-weight:800;font-size:13px}
-.res div{background:#0d1d33;padding:6px 10px;border-radius:20px;border:1px solid #23486f}
-#city{position:absolute;top:64px;bottom:140px;left:0;right:0;background:radial-gradient(circle at 50% 50%, #3d2a0a 0%, #1a1205 12%, #0d1e35 25%, #050b14 70%);overflow:hidden}
-.generator{position:absolute;left:50%;top:50%;width:110px;height:110px;transform:translate(-50%,-50%);background:radial-gradient(#ffb13a,#ff5e00);border-radius:28px;box-shadow:0 0 30px #ff7a00,0 0 120px #ff7a00;z-index:5;display:flex;align-items:center;justify-content:center;font-size:50px}
-.ring{position:absolute;left:50%;top:50%;border:1px dashed rgba(255,122,0,.25);border-radius:50%;transform:translate(-50%,-50%)}
-.building{position:absolute;width:52px;height:52px;background:#13263f;border:2px solid #2b4d75;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;transition:.2s;z-index:3}
-.building:hover{transform:scale(1.15);border-color:#4a8bff}
-.cold{filter:grayscale(1) brightness(.6);border-color:#334}
-#bottom{position:absolute;bottom:0;left:0;right:0;height:140px;background:#0a1628;border-top:2px solid #1a365d;display:grid;grid-template-columns:160px 1fr 160px;padding:8px;gap:8px}
-.btn{padding:10px;border:0;border-radius:12px;background:#173052;color:#8eb8e6;font-weight:800;cursor:pointer}
-.btn.active{background:#ff7a00;color:#000;box-shadow:0 0 15px #ff7a00}
-#event{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:340px;background:#0f223e;border:2px solid #ff7a00;border-radius:18px;padding:18px;z-index:20;display:none}
-</style>
-</head>
-<body>
-<div id="ui">
-<div style="font-weight:900;font-size:18px">❄️ الصقيع الأخير</div>
-<div class="res">
-<div>🪵 <span id="wood">200</span></div>
-<div>⛽ <span id="coal">180</span></div>
-<div>🔩 <span id="steel">40</span></div>
-<div>🍖 <span id="food">60</span></div>
-<div>🌡️ <span id="temp">-40</span>°</div>
-<div>📅 <span id="day">1</span></div>
-</div>
-</div>
-<div id="city">
-<div class="ring" style="width:220px;height:220px"></div>
-<div class="ring" style="width:380px;height:380px"></div>
-<div class="ring" style="width:560px;height:560px"></div>
-<div class="generator" id="gen">🔥</div>
-</div>
-<div id="bottom">
-<div>
-<div style="font-size:12px;margin-bottom:6px">أمل <span id="hopeV">65%</span></div>
-<div style="height:10px;background:#0a1a2f;border-radius:10px;overflow:hidden"><div id="hopeB" style="width:65%;height:100%;background:linear-gradient(90deg,#4aa8ff,#00ffcc)"></div></div>
-<div style="font-size:12px;margin:8px 0 6px">سخط <span id="disV">10%</span></div>
-<div style="height:10px;background:#0a1a2f;border-radius:10px;overflow:hidden"><div id="disB" style="width:10%;height:100%;background:linear-gradient(90deg,#ff4a4a,#ff8a00)"></div></div>
-<div style="margin-top:8px;font-size:11px">👥 <span id="pop">80</span> | 🤒 <span id="sick">0</span> | 🔥 <span id="heatR">1</span></div>
-</div>
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
-<button class="btn active" onclick="mode='tent'">⛺ خيمة<br><small>20🪵</small></button>
-<button class="btn" onclick="mode='med'">🏥 مشفى<br><small>30🪵 10🔩</small></button>
-<button class="btn" onclick="mode='hunt'">🏹 صيد<br><small>20🪵</small></button>
-<button class="btn" onclick="mode='mine'">⛏️ منجم فحم<br><small>30🪵</small></button>
-<button class="btn" onclick="research()">🔬 بحث</button>
-<button class="btn" onclick="law()">⚖️ قانون</button>
-</div>
-<div>
-<button class="btn" style="width:100%;background:#ff7a00;color:#000;margin-bottom:6px" onclick="fuel()">⚡ دفع المولد -20⛽</button>
-<button class="btn" style="width:100%" onclick="nextDay()">⏭️ نهاية اليوم</button>
-<div id="msg" style="font-size:11px;margin-top:6px;line-height:1.4;height:54px;overflow:auto">العاصفة تقترب. ابنِ حول المولد. المباني البعيدة تتجمد.</div>
-</div>
-</div>
-<div id="event">
-<h3 id="evTitle"></h3>
-<p id="evText" style="font-size:13px;line-height:1.6"></p>
-<div style="display:flex;gap:8px"><button id="ev1" class="btn" style="flex:1"></button><button id="ev2" class="btn" style="flex:1;background:#2a3d5a"></button></div>
-</div>
-<script>
-let S={wood:200,coal:180,steel:40,food:60,temp:-40,day:1,pop:80,sick:0,hope:65,dis:10,heatRange:1,heat:75,buildings:[]};
-let mode='tent';
-const city=document.getElementById('city');
-function upd(){
-wood.textContent=S.wood;coal.textContent=S.coal;steel.textContent=S.steel;food.textContent=S.food;
-temp.textContent=S.temp;day.textContent=S.day;pop.textContent=S.pop;sick.textContent=S.sick;
-heatR.textContent=S.heatRange;hopeV.textContent=S.hope+'%';disV.textContent=S.dis+'%';
-hopeB.style.width=S.hope+'%';disB.style.width=S.dis+'%';
-gen.style.boxShadow=`0 0 ${S.heat}px #ff7a00, 0 0 ${S.heat*2}px rgba(255,122,0,.3)`;
-if(S.dis>=100||S.hope<=0||S.pop<=0){alert('انتهت المدينة!');location.reload()}
-}
-function dist(x,y){return Math.sqrt((x-50)*(x-50)+(y-50)*(y-50))}
-city.addEventListener('click',e=>{
- if(e.target!==city &&!e.target.classList.contains('ring')) return;
- let rect=city.getBoundingClientRect();
- let x=((e.clientX-rect.left)/rect.width)*100;
- let y=((e.clientY-rect.top)/rect.height)*100;
- let d=dist(x,y); if(d<12) return;
- let cost={tent:{wood:20},med:{wood:30,steel:10},hunt:{wood:20},mine:{wood:30}}[mode];
- if(!cost) return;
- if((cost.wood||0)>S.wood||(cost.steel||0)>S.steel) {msg.textContent='موارد غير كافية!';return;}
- S.wood-=(cost.wood||0); S.steel-=(cost.steel||0);
- let b=document.createElement('div'); b.className='building';
- b.textContent={tent:'⛺',med:'🏥',hunt:'🏹',mine:'⛏️'}[mode];
- b.style.left=x+'%'; b.style.top=y+'%';
- let cold=d> S.heatRange*18+10; if(cold) b.classList.add('cold');
- b.title=cold?'بارد - يحتاج حرارة أعلى':'دافئ';
- city.appendChild(b); S.buildings.push({type:mode,x,y,cold});
- msg.textContent=`بنيت ${mode} - المسافة ${Math.round(d)}%`;
- upd();
-});
-function fuel(){ if(S.coal>=20){S.coal-=20;S.heat=Math.min(100,S.heat+28);S.heatRange=Math.min(4,S.heatRange+0.15);upd(); msg.textContent='المولد ينفجر بالحرارة!';}}
-function nextDay(){
- S.day++; S.temp-=Math.floor(Math.random()*7+2); S.heat-=22;
- S.food-=Math.ceil(S.pop/10); if(S.food<0){S.hope-=10;S.sick+=5;S.food=0;showEvent('نفد الطعام','الجوع يضرب المدينة','وزع الحص نصف حصه','اقتحم المخزن');}
- if(S.heat<30){let dead=Math.floor(Math.random()*4+1);S.pop-=dead;S.sick+=2;S.hope-=12;S.dis+=10; msg.textContent=`البرد قتل ${dead}`;}
- S.buildings.forEach(b=>{let el=document.querySelectorAll('.building')[S.buildings.indexOf(b)];if(el){
+*{margin:0;padding:0;box-sizing:border-box;touch-action:none;-webkit-touch-callout:none}
+body{background:#050b12;overflow:hidden;font-family:-apple-system,system-ui}
+#game{width:100vw;height:100vh}
+#ui{position:absolute;inset:0;pointer-events:none;z-index:10;display:flex;flex-direction:column;justify-content:space-between}
+.bar{display:flex;justify-content:space-between;padding:10px 12px;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);color:#cfe4f5;font-size:11px;pointer-events:auto;border-bottom:1px solid #1a3a52}
+.res{display:flex;gap:10px;flex-wrap:wrap}
+.res b{color:#6ecbff}
+.mid{display:flex;gap:8px;padding:8px}
+.mid div{flex:1;height:7px;background:rgba(0,0,0,0.6);border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.1)}
+#hope{height:100%;background:linear-gradient(90deg,#2dd4bf,#5eead4);width:65%}
+#dis{height:100%;background:linear-gradient(90deg,#ef4444,#f87171);width:20%}
+.builds{pointer-events:auto;display:flex;gap:7px;padding:10px;background:rgba(5,15,25,0.92);border-top:1px solid #1e3f5a;overflow-x:auto;scrollbar-width:none}
+.builds::-webkit-scrollbar{display:none}
+.btn{min-width:70px;height:68px;background:linear-gradient(180deg,#132a3e,#0e2030);border:1px solid #244a67;border-radius:10px;color:#9cc9e6;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;gap:1px}
+.btn
