@@ -3,267 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>FrostHope - النجاة من الصقيع</title>
+    <title>FrostHope - نجاة الصقيع</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            background: #050b14;
-            overflow: hidden;
-            font-family: sans-serif;
-            touch-action: none;
+            background: #020617;
+            color: #f8fafc;
+            font-family: system-ui, -apple-system, sans-serif;
+            touch-action: manipulation;
             user-select: none;
-        }
-        canvas {
-            display: block;
-            background: linear-gradient(to bottom, #030712, #0d1b33);
-        }
-        #ui {
-            position: absolute;
-            top: 20px;
-            left: 0;
-            right: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            color: #fff;
-            pointer-events: none;
-        }
-        .score {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
-        }
-        .bar-container {
-            width: 220px;
-            height: 14px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 7px;
+            justify-content: space-between;
+            height: 100vh;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.4);
         }
-        .bar-fill {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, #ff4e50, #f9d423);
-            transition: width 0.1s linear;
-        }
-        #gameover {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+        header {
             text-align: center;
+            padding: 10px;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+        }
+        h1 {
+            margin: 0;
+            font-size: 20px;
+            color: #38bdf8;
+            letter-spacing: 1px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            width: 92%;
+            max-width: 400px;
+            margin: 10px auto;
+        }
+        .stat-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 8px;
+            text-align: center;
+        }
+        .stat-title {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+        .stat-value {
+            font-size: 16px;
+            font-weight: bold;
             color: #fff;
-            display: none;
-            pointer-events: auto;
-            background: rgba(5, 11, 20, 0.9);
-            padding: 30px;
-            border-radius: 20px;
-            border: 1px solid rgba(0, 242, 255, 0.3);
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
         }
-        #gameover h1 {
-            font-size: 32px;
-            color: #ff4e50;
+        .main-screen {
+            flex: 1;
+            width: 92%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: radial-gradient(circle, #0f172a 0%, #020617 100%);
+            border-radius: 16px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
             margin-bottom: 10px;
-            text-shadow: 0 0 15px rgba(255, 78, 80, 0.7);
+            padding: 15px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+            text-align: center;
         }
-        #gameover p {
-            font-size: 18px;
+        .generator-core {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #f97316 0%, #c2410c 70%, #000 100%);
+            box-shadow: 0 0 30px #f97316;
+            margin: 15px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            animation: pulse 2s infinite alternate;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 15px #f97316; }
+            100% { transform: scale(1.05); box-shadow: 0 0 35px #ea580c; }
+        }
+        .controls-area {
+            width: 92%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             margin-bottom: 20px;
         }
         .btn {
-            background: #00f2fe;
-            color: #050b14;
+            background: #0284c7;
+            color: white;
             border: none;
-            padding: 12px 30px;
-            font-size: 18px;
+            padding: 14px;
+            font-size: 16px;
             font-weight: bold;
-            border-radius: 25px;
+            border-radius: 12px;
             cursor: pointer;
-            box-shadow: 0 0 15px rgba(0, 242, 255, 0.6);
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);
+            transition: 0.1s;
+        }
+        .btn:active {
+            transform: scale(0.97);
+            background: #0369a1;
+        }
+        .btn-secondary {
+            background: #334155;
+            box-shadow: none;
+        }
+        .log-box {
+            font-size: 13px;
+            color: #cbd5e1;
+            min-height: 45px;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+        #gameover-screen {
+            position: absolute;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.95);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            border-radius: 16px;
+            z-index: 10;
         }
     </style>
 </head>
 <body>
 
-    <div id="ui">
-        <div class="score">النقاط: <span id="scoreVal">0</span></div>
-        <div class="bar-container">
-            <div id="heatBar" class="bar-fill"></div>
+    <header>
+        <h1>FrostHope: ملجأ الصقيع</h1>
+    </header>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-title">الحرارة</div>
+            <div class="stat-value" id="heatVal">100°</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">الفحم</div>
+            <div class="stat-value" id="coalVal">50</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">الناجون</div>
+            <div class="stat-value" id="survivorsVal">20</div>
         </div>
     </div>
 
-    <div id="gameover">
-        <h1>تجمدت في العاصفة!</h1>
-        <p>مجموع نقاطك: <span id="finalScore">0</span></p>
-        <button class="btn" onclick="restartGame()">إعادة المحاولة</button>
+    <div class="main-screen">
+        <div id="gameover-screen">
+            <h2 style="color: #ef4444; margin-top:0;">انطفأ المولد وتجمد الجميع!</h2>
+            <p id="finalDays" style="font-size: 15px; margin-bottom: 20px;"></p>
+            <button class="btn" onclick="resetGame()">إعادة بناء الملجأ</button>
+        </div>
+
+        <div class="generator-core" id="coreIcon">🔥</div>
+        <div style="font-size: 14px; color: #38bdf8; font-weight: bold;">اليوم: <span id="dayVal">1</span></div>
+        <div class="log-box" id="gameLog">العاصفة تقترب من الملجأ. حافظ على تشغيل المولد وجمع الفحم للنجاة.</div>
     </div>
 
-    <canvas id="gameCanvas"></canvas>
+    <div class="controls-area">
+        <button class="btn" onclick="gatherCoal()">جمع الفحم (+15)</button>
+        <button class="btn btn-secondary" onclick="stokeGenerator()">تغذية المولد بالفحم (-10 فحم، +20 حرارة)</button>
+    </div>
 
     <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
-        let score = 0;
+        let days = 1;
         let heat = 100;
+        let coal = 50;
+        let survivors = 20;
         let isGameOver = false;
 
-        let player = {
-            x: canvas.width / 2,
-            y: canvas.height - 120,
-            radius: 24,
-            targetX: canvas.width / 2
-        };
-
-        let crystals = [];
-        let snowflakes = [];
-
-        for (let i = 0; i < 70; i++) {
-            snowflakes.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                radius: Math.random() * 2.5 + 0.8,
-                speed: Math.random() * 2 + 0.8,
-                drift: Math.random() * 1.2 - 0.6
-            });
+        function updateUI() {
+            document.getElementById('dayVal').innerText = days;
+            document.getElementById('heatVal').innerText = heat + '°';
+            document.getElementById('coalVal').innerText = coal;
+            document.getElementById('survivorsVal').innerText = survivors;
         }
 
-        window.addEventListener('pointerdown', (e) => {
-            if (isGameOver) return;
-            player.targetX = e.clientX;
-        });
-
-        window.addEventListener('pointermove', (e) => {
-            if (isGameOver || e.buttons === 0) return;
-            player.targetX = e.clientX;
-        });
-
-        function spawnCrystal() {
-            crystals.push({
-                x: Math.random() * (canvas.width - 60) + 30,
-                y: -30,
-                radius: 15,
-                speed: 3.5 + Math.min(score * 0.04, 6)
-            });
+        function log(text) {
+            document.getElementById('gameLog').innerText = text;
         }
 
-        let spawnTimer = 0;
+        function gatherCoal() {
+            if (isGameOver) return;
+            let collected = Math.floor(Math.random() * 8) + 12;
+            coal += collected;
+            log(`نجح فريق الاستكشاف في جلب ${collected وحدة من الفحم من وسط الجليد.`);
+            advanceTurn();
+        }
 
-        function update() {
+        function stokeGenerator() {
+            if (isGameOver) return;
+            if (coal < 10) {
+                log("فحم غير كافٍ لتغذية المولد! اجمع الفحم فوراً.");
+                return;
+            }
+            coal -= 10;
+            heat = Math.min(100, heat + 25);
+            log("تم إلقاء الفحم في المولد، وارتفعت حرارة الملجأ بشكل ملحوظ.");
+            advanceTurn();
+        }
+
+        function advanceTurn() {
             if (isGameOver) return;
 
-            player.x += (player.targetX - player.x) * 0.22;
+            days++;
+            // تناقص طبيعي للحرارة والفحم مع مرور الأيام والعاصفة
+            let heatLoss = Math.floor(Math.random() * 6) + 12;
+            heat -= heatLoss;
 
-            heat -= 0.15;
             if (heat <= 0) {
                 heat = 0;
-                gameOver();
-            }
-            document.getElementById('heatBar').style.width = heat + '%';
-
-            for (let flake of snowflakes) {
-                flake.y += flake.speed;
-                flake.x += flake.drift;
-                if (flake.y > canvas.height) {
-                    flake.y = -10;
-                    flake.x = Math.random() * canvas.width;
-                }
+                triggerGameOver();
+                return;
             }
 
-            spawnTimer++;
-            if (spawnTimer > 40) {
-                spawnCrystal();
-                spawnTimer = 0;
+            if (heat < 40) {
+                let lost = Math.floor(Math.random() * 3) + 1;
+                survivors = Math.max(0, survivors - lost);
+                log(`تحذير! البرد القارس أدى لفقدان ${lost} من الناجين هذا اليوم.`);
             }
 
-            for (let i = crystals.length - 1; i >= 0; i--) {
-                let c = crystals[i];
-                c.y += c.speed;
-
-                let dist = Math.hypot(player.x - c.x, player.y - c.y);
-                if (dist < player.radius + c.radius) {
-                    score += 10;
-                    heat = Math.min(100, heat + 28);
-                    document.getElementById('scoreVal').innerText = score;
-                    crystals.splice(i, 1);
-                    continue;
-                }
-
-                if (c.y > canvas.height + 50) {
-                    crystals.splice(i, 1);
-                }
-            }
+            updateUI();
         }
 
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
-            for (let flake of snowflakes) {
-                ctx.beginPath();
-                ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            for (let c of crystals) {
-                ctx.save();
-                ctx.shadowBlur = 18;
-                ctx.shadowColor = '#f9d423';
-                ctx.fillStyle = '#f9d423';
-                ctx.beginPath();
-                ctx.arc(c.x, c.y, c.radius, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-            }
-
-            ctx.save();
-            ctx.shadowBlur = 25;
-            ctx.shadowColor = '#00f2fe';
-            ctx.fillStyle = '#ffffff';
-            ctx.beginPath();
-            ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-        }
-
-        function loop() {
-            update();
-            draw();
-            if (!isGameOver) {
-                requestAnimationFrame(loop);
-            }
-        }
-
-        function gameOver() {
+        function triggerGameOver() {
             isGameOver = true;
-            document.getElementById('finalScore').innerText = score;
-            document.getElementById('gameover').style.display = 'block';
+            document.getElementById('finalDays').innerText = `صمدتم في وجه العاصفة لمدة ${days} أดยاً.`;
+            document.getElementById('gameover-screen').style.display = 'flex';
         }
 
-        function restartGame() {
-            score = 0;
+        function resetGame() {
+            days = 1;
             heat = 100;
+            coal = 50;
+            survivors = 20;
             isGameOver = false;
-            crystals = [];
-            player.x = canvas.width / 2;
-            player.targetX = canvas.width / 2;
-            document.getElementById('scoreVal').innerText = score;
-            document.getElementById('gameover').style.display = 'none';
-            loop();
+            document.getElementById('gameover-screen').style.display = 'none';
+            log("بدأت دورة جديدة من نجاة الصقيع. حافظ على تدفئة الملجأ.");
+            updateUI();
         }
 
-        loop();
+        updateUI();
     </script>
 </body>
 </html>
