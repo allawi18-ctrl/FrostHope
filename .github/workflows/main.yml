@@ -1,33 +1,36 @@
-name: Build and Deploy Web Version
+name: "Godot Web Export & Deploy"
 
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
-
-permissions:
-  contents: write
+    branches:
+      - main
 
 jobs:
-  build-web:
+  export_web:
+    name: Web Export
     runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.2.1
     steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v4
-
-      - name: Setup Godot Engine
-        uses: chickensoft-games/setup-godot@v1
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
-          version: '4.3.0'
-          include-templates: true
+          lfs: true
 
-      - name: Export Web Version
+      - name: Setup Godot Templates
         run: |
-          mkdir -p build/web
-          godot --headless --export-release "Web" build/web/index.html || true
+          mkdir -v -p ~/.local/share/godot/build_templates
+          mv /root/.local/share/godot/templates/* ~/.local/share/godot/build_templates/
+
+      - name: Create Web Build Directory
+        run: mkdir -v -p build/web
+
+      - name: Export Web
+        run: godot --headless --export-release "Web" build/web/index.html
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: Peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/web
+          publish_branch: gh-pages
