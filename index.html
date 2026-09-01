@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>FrostHope - لعبة الصقيع</title>
+    <title>FrostHope - النجاة من الصقيع</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            background: #0b1329;
+            background: #050b14;
             overflow: hidden;
             font-family: sans-serif;
             touch-action: none;
@@ -16,7 +16,7 @@
         }
         canvas {
             display: block;
-            background: linear-gradient(to bottom, #050b14, #121c38);
+            background: linear-gradient(to bottom, #030712, #0d1b33);
         }
         #ui {
             position: absolute;
@@ -36,7 +36,7 @@
             text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
         }
         .bar-container {
-            width: 200px;
+            width: 220px;
             height: 14px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 7px;
@@ -58,9 +58,14 @@
             color: #fff;
             display: none;
             pointer-events: auto;
+            background: rgba(5, 11, 20, 0.9);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
         }
         #gameover h1 {
-            font-size: 36px;
+            font-size: 32px;
             color: #ff4e50;
             margin-bottom: 10px;
             text-shadow: 0 0 15px rgba(255, 78, 80, 0.7);
@@ -92,8 +97,8 @@
     </div>
 
     <div id="gameover">
-        <h1>انتهى الدفء!</h1>
-        <p>تجمدت في العاصفة. مجموع نقاطك: <span id="finalScore">0</span></p>
+        <h1>تجمدت في العاصفة!</h1>
+        <p>مجموع نقاطك: <span id="finalScore">0</span></p>
         <button class="btn" onclick="restartGame()">إعادة المحاولة</button>
     </div>
 
@@ -117,20 +122,20 @@
         let player = {
             x: canvas.width / 2,
             y: canvas.height - 120,
-            radius: 22,
+            radius: 24,
             targetX: canvas.width / 2
         };
 
         let crystals = [];
         let snowflakes = [];
 
-        for (let i = 0; i < 60; i++) {
+        for (let i = 0; i < 70; i++) {
             snowflakes.push({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
-                radius: Math.random() * 2.5 + 1,
-                speed: Math.random() * 1.5 + 0.5,
-                drift: Math.random() * 1 - 0.5
+                radius: Math.random() * 2.5 + 0.8,
+                speed: Math.random() * 2 + 0.8,
+                drift: Math.random() * 1.2 - 0.6
             });
         }
 
@@ -148,8 +153,8 @@
             crystals.push({
                 x: Math.random() * (canvas.width - 60) + 30,
                 y: -30,
-                radius: 14,
-                speed: 3 + Math.min(score * 0.05, 5)
+                radius: 15,
+                speed: 3.5 + Math.min(score * 0.04, 6)
             });
         }
 
@@ -158,9 +163,9 @@
         function update() {
             if (isGameOver) return;
 
-            player.x += (player.targetX - player.x) * 0.2;
+            player.x += (player.targetX - player.x) * 0.22;
 
-            heat -= 0.12;
+            heat -= 0.15;
             if (heat <= 0) {
                 heat = 0;
                 gameOver();
@@ -177,7 +182,7 @@
             }
 
             spawnTimer++;
-            if (spawnTimer > 45) {
+            if (spawnTimer > 40) {
                 spawnCrystal();
                 spawnTimer = 0;
             }
@@ -189,7 +194,7 @@
                 let dist = Math.hypot(player.x - c.x, player.y - c.y);
                 if (dist < player.radius + c.radius) {
                     score += 10;
-                    heat = Math.min(100, heat + 25);
+                    heat = Math.min(100, heat + 28);
                     document.getElementById('scoreVal').innerText = score;
                     crystals.splice(i, 1);
                     continue;
@@ -204,7 +209,7 @@
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
             for (let flake of snowflakes) {
                 ctx.beginPath();
                 ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
@@ -213,7 +218,7 @@
 
             for (let c of crystals) {
                 ctx.save();
-                ctx.shadowBlur = 15;
+                ctx.shadowBlur = 18;
                 ctx.shadowColor = '#f9d423';
                 ctx.fillStyle = '#f9d423';
                 ctx.beginPath();
@@ -223,7 +228,7 @@
             }
 
             ctx.save();
-            ctx.shadowBlur = 20;
+            ctx.shadowBlur = 25;
             ctx.shadowColor = '#00f2fe';
             ctx.fillStyle = '#ffffff';
             ctx.beginPath();
